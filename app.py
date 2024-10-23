@@ -9,7 +9,7 @@ app = Flask(__name__)
 def index():
     return render_template("index.html")
 
-@app.route("/NumberRecognition", methods=["POST"])
+@app.route("/DigitRecognition", methods=["POST"])
 def predict_digit():
     pil_img = Image.open(request.files["img"]).convert("L")
     img = np.array(pil_img)

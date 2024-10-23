@@ -121,7 +121,7 @@ function onRecognition() {
         const body = new FormData();
         body.append('img', blob, "dummy.png")
         try{
-            const response = await fetch("./NumberRecognition", {
+            const response = await fetch("./DigitRecognition", {
                 method: "POST",
                 body: body,
             })
