@@ -121,7 +121,7 @@ function onRecognition() {
         const body = new FormData();
         body.append('img', blob, "dummy.png")
         try{
-            const response = await fetch("./DigitRecognition", {
+            const response = await fetch("./NumberRecognition", {
                 method: "POST",
                 body: body,
             })
@@ -139,9 +139,9 @@ function onRecognition() {
 function showResult(res) {
     divOut.textContent = res.pred;
     document.getElementById("prob").innerHTML =
-        "Probability : " + res.probs[res.pred].toFixed(2) + "%";
+        "Вероятность : " + res.probs[0][res.pred].toFixed(2) + "%";
     svgGraph.selectAll("rect")
-        .data(res.probs)
+        .data(res.probs[0])
         .transition()
         .duration(300)
         .style("fill", (d, i) => i === res.pred ? "blue" : "green")
