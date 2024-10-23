@@ -43,7 +43,6 @@ if train_new_model:
     model.save("checkpoint/handwritten_digits.keras")
 else:
     model = keras.saving.load_model("checkpoint/handwritten_digits.keras")
-print('yay')
 
 def getBestShift(img):
     cy, cx = center_of_mass(img)
