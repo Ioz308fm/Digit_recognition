@@ -21,3 +21,7 @@ def predict_digit():
     res_json["probs"] = (res * 100).tolist()
 
     return json.dumps(res_json)
+
+
+if __name__ == '__main__':
+	app.run(debug=True, port=5000)
