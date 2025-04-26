@@ -1,10 +1,11 @@
 import os
 import cv2
 import numpy as np
-import tensorflow as tf
-import keras
+# import tensorflow as tf
+# import keras
 import json
 import math
+from scipy import ndimage
 from scipy.ndimage import center_of_mass
 
 # тренировка новой модели
