@@ -2,7 +2,7 @@ from flask import Flask, render_template, request
 import json
 # from PIL import Image
 # import numpy as np
-from train_test import rec_digit
+# from train_test import rec_digit
 app = Flask(__name__)
 
 @app.route("/")
