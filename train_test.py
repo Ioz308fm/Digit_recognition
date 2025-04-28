@@ -5,6 +5,7 @@ import tensorflow as tf
 import keras
 import json
 import math
+from scipy import ndimage
 from scipy.ndimage import center_of_mass
 
 # тренировка новой модели
@@ -62,7 +63,7 @@ def shift(img, sx, sy):
 
 
 def rec_digit(img):
-    #img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+    # img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
     gray = 255 - img
     # применяем пороговую обработку
     (thresh, gray) = cv2.threshold(gray, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
@@ -93,7 +94,7 @@ def rec_digit(img):
     # расширяем до размера 28x28
     colsPadding = (int(math.ceil((28 - cols) / 2.0)), int(math.floor((28 - cols) / 2.0)))
     rowsPadding = (int(math.ceil((28 - rows) / 2.0)), int(math.floor((28 - rows) / 2.0)))
-    gray = np.lib.pad(gray, (rowsPadding, colsPadding), 'constant')
+    gray = np.pad(gray, (rowsPadding, colsPadding), 'constant')
 
     # сдвигаем центр масс
     shiftx, shifty = getBestShift(gray)
