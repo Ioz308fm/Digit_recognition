@@ -11,6 +11,7 @@ window.onload = () => {
     ctxIn.lineWidth = 7;
     ctxIn.lineCap = "round";
     initProbGraph();
+    initProbGraph2(); 
 }
 
 function initProbGraph() {
@@ -44,6 +45,40 @@ function initProbGraph() {
         .attr("x", 0)
         .attr("width", d => d * 2)
         .call(d3.axisLeft(yScale));
+}
+
+let svgGraph2 = null; // объявить глобально где-то в начале файла
+
+function initProbGraph2() {
+    const dummyData = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]; // заглушка
+    const margin = { top: 10, right: 10, bottom: 10, left: 20 };
+    const width = 250;
+    const height = 196;
+
+    const yScale = d3.scaleLinear()
+        .domain([9, 0])
+        .range([height, 0]);
+
+    svgGraph2 = d3.select("#probGraph2")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    svgGraph2.append("g")
+        .attr("class", "y axis")
+        .call(d3.axisLeft(yScale));
+
+    const barHeight = 20;
+    svgGraph2.selectAll("rect")
+        .data(dummyData)
+        .enter()
+        .append("rect")
+        .attr("y", (d, i) => (yScale(i) - barHeight / 2))
+        .attr("height", barHeight)
+        .style("fill", "green")
+        .attr("x", 0)
+        .attr("width", d => d * 2);
 }
 
 cvsIn.addEventListener("mousedown", e => {
@@ -114,36 +149,58 @@ function onClear() {
 }
 
 // post digit to server for recognition
-function onRecognition() {
+async function onRecognition() {
     console.time("time");
 
     cvsIn.toBlob(async blob => {
         const body = new FormData();
-        body.append('img', blob, "dummy.png")
-        try{
-            const response = await fetch("./DigitRecognition", {
-                method: "POST",
-                body: body,
-            })
-            const resjson = await response.json()
-            showResult(resjson)
-        } catch (error){
-            alert("error", error)
-        }
-    })
+        body.append('img', blob, "dummy.png");
 
-    console.timeEnd("time");
+        try {
+            const res1 = await fetch("./DigitRecognition", { method: "POST", body });
+            const res2 = await fetch("./DigitRecognition2", { method: "POST", body });
+
+            const data1 = await res1.json();
+            const data2 = await res2.json();
+
+            showResult(data1, data2); // передаем оба результата
+        } catch (error) {
+            alert("Ошибка: " + error);
+        }
+
+        console.timeEnd("time");
+    });
 }
 
 
-function showResult(res) {
-    divOut.textContent = res.pred;
+function showResult(res1, res2) {
+    // Первое предсказание
+    const pred1 = res1.pred;
+    const probs1 = res1.probs[0]; // берем первый (и единственный) массив вероятностей
+
+    document.getElementById("pred").textContent = pred1;
     document.getElementById("prob").innerHTML =
-        "Вероятность : " + res.probs[0][res.pred].toFixed(2) + "%";
+        "Вероятность : " + probs1[pred1].toFixed(2) + "%";
+
     svgGraph.selectAll("rect")
-        .data(res.probs[0])
+        .data(probs1)
         .transition()
         .duration(300)
-        .style("fill", (d, i) => i === res.pred ? "blue" : "green")
-        .attr("width", d => d * 2)
+        .style("fill", (d, i) => i === pred1 ? "blue" : "green")
+        .attr("width", d => d * 2);
+
+    // Второе предсказание
+    const pred2 = res2.pred;
+    const probs2 = res2.probs[0]; // аналогично
+
+    document.getElementById("pred2").textContent = pred2;
+    document.getElementById("prob2").innerHTML =
+        "Вероятность : " + probs2[pred2].toFixed(2) + "%";
+
+    svgGraph2.selectAll("rect")
+        .data(probs2)
+        .transition()
+        .duration(300)
+        .style("fill", (d, i) => i === pred2 ? "blue" : "green")
+        .attr("width", d => d * 2);
 }

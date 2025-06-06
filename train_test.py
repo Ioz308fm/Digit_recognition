@@ -105,3 +105,18 @@ def rec_digit(img):
     img = gray / 255.0
     img = np.array(img).reshape(-1, 28, 28, 1)
     return model.predict(img)
+
+def rec_digit_2(img):
+    res = rec_digit(img)
+    res = add_noise_to_probs(res, noise_level=0.2)
+    print([round(x, 2) for x in res[0]])
+    return res
+
+
+def add_noise_to_probs(probs, noise_level=0.1):
+    noise = np.random.uniform(-noise_level, noise_level, size=len(probs))
+    noisy_probs = probs + noise
+    noisy_probs = np.clip(noisy_probs, 0, None)
+    noisy_probs /= noisy_probs.sum()
+
+    return noisy_probs
