@@ -7,6 +7,9 @@ import json
 import math
 from scipy import ndimage
 from scipy.ndimage import center_of_mass
+import pandas as pd
+
+from functions_py import qwen_pipeline_train, qwen_optimized_test_class_alg, batch_get_labels
 
 # тренировка новой модели
 train_new_model = False
@@ -104,19 +107,63 @@ def rec_digit(img):
     #cv2.imwrite('test numbers/digit{}.png'.format(img_number), gray)
     img = gray / 255.0
     img = np.array(img).reshape(-1, 28, 28, 1)
+    print('DDDD')
+    print(model.predict(img))
     return model.predict(img)
 
-def rec_digit_2(img):
-    res = rec_digit(img)
-    res = add_noise_to_probs(res, noise_level=0.2)
-    print([round(x, 2) for x in res[0]])
+def rec_digit_2(img, data_train, data_train_means, data_test, fourier_coef):
+    # img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+    # gray = 255 - img
+    # dim = (28, 28)
+    # resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
+    #cv2.imwrite('test numbers/digit{}.png'.format(img_number), gray)
+    # img = resized / 255.0
+    # print('shape')
+    # print(img.shape)
+    # img = np.array(img).reshape(-1, 28, 28, 1)
+    # flattened_image = img.reshape(1, -1)  # форма: (1, 784)
+    print(img.shape)
+    
+    df = img.copy()
+# Преобразуем в DataFrame
+    df.columns = [f"pixel{i}" for i in range(784)]
+
+    img_transformed = transform_pixels_to_sums_vectorized(df.copy()).values
+
+
+    t = 1.5847369
+
+    target = 'label'
+    res = batch_get_labels(
+        target, data_train, data_train_means, fourier_coef, img_transformed, t, is_labeled = False
+    )
+    print('REEEEES')
+    print(res)
+    print(res.argmax)
     return res
 
 
-def add_noise_to_probs(probs, noise_level=0.1):
-    noise = np.random.uniform(-noise_level, noise_level, size=len(probs))
-    noisy_probs = probs + noise
-    noisy_probs = np.clip(noisy_probs, 0, None)
-    noisy_probs /= noisy_probs.sum()
+def transform_pixels_to_sums_vectorized(df):
+    # Создаем копию исходного DataFrame
+    result_df = pd.DataFrame()
+    
+    # Получаем все пиксельные колонки
+    pixel_cols = [f'pixel{i}' for i in range(784)]
+    pixels = df[pixel_cols].values
+    
+    # Преобразуем в 3D массив (n_images, 28, 28)
+    images = pixels.reshape(-1, 28, 28)
+    
+    # Суммы по строкам (axis=2 - сумма по столбцам в каждом ряду)
+    row_sums = images.sum(axis=2)
+    
+    # Суммы по столбцам (axis=1 - сумма по рядам в каждом столбце)
+    col_sums = images.sum(axis=1)
+    
+    # Добавляем суммы в DataFrame
+    for i in range(28):
+        result_df[f'sum_row{i}'] = row_sums[:, i] / 28
+    for i in range(28):
+        result_df[f'sum_column{i}'] = col_sums[:, i] / 28
 
-    return noisy_probs
+    return result_df

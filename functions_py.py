@@ -7,6 +7,7 @@ from numba import njit
 from scipy.spatial.distance import cdist
 import optuna
 
+
 # Оптимизированная функция вычисления коэффициентов Фурье
 @njit
 def compute_coefficients(g_values, D, M):

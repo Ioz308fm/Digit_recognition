@@ -11,7 +11,7 @@ window.onload = () => {
     ctxIn.lineWidth = 7;
     ctxIn.lineCap = "round";
     initProbGraph();
-    initProbGraph2(); 
+    // initProbGraph2(); 
 }
 
 function initProbGraph() {
@@ -47,39 +47,39 @@ function initProbGraph() {
         .call(d3.axisLeft(yScale));
 }
 
-let svgGraph2 = null; // объявить глобально где-то в начале файла
+// let svgGraph2 = null; // объявить глобально где-то в начале файла
 
-function initProbGraph2() {
-    const dummyData = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]; // заглушка
-    const margin = { top: 10, right: 10, bottom: 10, left: 20 };
-    const width = 250;
-    const height = 196;
+// function initProbGraph2() {
+//     const dummyData = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]; // заглушка
+//     const margin = { top: 10, right: 10, bottom: 10, left: 20 };
+//     const width = 250;
+//     const height = 196;
 
-    const yScale = d3.scaleLinear()
-        .domain([9, 0])
-        .range([height, 0]);
+//     const yScale = d3.scaleLinear()
+//         .domain([9, 0])
+//         .range([height, 0]);
 
-    svgGraph2 = d3.select("#probGraph2")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+//     svgGraph2 = d3.select("#probGraph2")
+//         .attr("width", width + margin.left + margin.right)
+//         .attr("height", height + margin.top + margin.bottom)
+//         .append("g")
+//         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    svgGraph2.append("g")
-        .attr("class", "y axis")
-        .call(d3.axisLeft(yScale));
+//     svgGraph2.append("g")
+//         .attr("class", "y axis")
+//         .call(d3.axisLeft(yScale));
 
-    const barHeight = 20;
-    svgGraph2.selectAll("rect")
-        .data(dummyData)
-        .enter()
-        .append("rect")
-        .attr("y", (d, i) => (yScale(i) - barHeight / 2))
-        .attr("height", barHeight)
-        .style("fill", "green")
-        .attr("x", 0)
-        .attr("width", d => d * 2);
-}
+//     const barHeight = 20;
+//     svgGraph2.selectAll("rect")
+//         .data(dummyData)
+//         .enter()
+//         .append("rect")
+//         .attr("y", (d, i) => (yScale(i) - barHeight / 2))
+//         .attr("height", barHeight)
+//         .style("fill", "green")
+//         .attr("x", 0)
+//         .attr("width", d => d * 2);
+// }
 
 cvsIn.addEventListener("mousedown", e => {
     if (e.button === 0) {
@@ -191,16 +191,16 @@ function showResult(res1, res2) {
 
     // Второе предсказание
     const pred2 = res2.pred;
-    const probs2 = res2.probs[0]; // аналогично
+    // const probs2 = res2.probs[0]; // аналогично
 
     document.getElementById("pred2").textContent = pred2;
-    document.getElementById("prob2").innerHTML =
-        "Вероятность : " + probs2[pred2].toFixed(2) + "%";
+    // document.getElementById("prob2").innerHTML =
+    //     "Вероятность : " + probs2[pred2].toFixed(2) + "%";
 
-    svgGraph2.selectAll("rect")
-        .data(probs2)
-        .transition()
-        .duration(300)
-        .style("fill", (d, i) => i === pred2 ? "blue" : "green")
-        .attr("width", d => d * 2);
+    // svgGraph2.selectAll("rect")
+    //     .data(probs2)
+    //     .transition()
+    //     .duration(300)
+    //     .style("fill", (d, i) => i === pred2 ? "blue" : "green")
+    //     .attr("width", d => d * 2);
 }
